@@ -7,6 +7,8 @@ import exception.DBFeedException;
 import fileparse.saxparse.ParseXMLBySaxThread;
 import fileparse.staxparse.ParseXmlByStaxThread;
 import org.apache.log4j.Logger;
+import service.RdcFileStatusService;
+import service.impl.RdcFileStatusServiceImp;
 
 import java.io.File;
 import java.sql.CallableStatement;
@@ -28,6 +30,7 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
     private Connection DBConnection;
     public static AtomicInteger batch_index = null;
     public CountDownLatch endControl;
+    private RdcFileStatusService rdcFileStatusService = new RdcFileStatusServiceImp();
 
     @Override
     public void process() {
@@ -44,8 +47,8 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                     uuid = UUID.randomUUID().toString();
                     logger.info("当前解析文件{}" + fileName + "    uuid{}" + uuid);
                     this.DBConnection = OracleConnection.getConnection();
-                    insertFileStatus(this.DBConnection, uuid,
-                            insertFile.getName(), "StartPDP");
+//                    insertFileStatus(this.DBConnection, uuid, insertFile.getName(), "StartPDP");
+                    rdcFileStatusService.insert(insertFile.getName(), uuid);
                     this.DBConnection.close();
                     Thread parseXmlThread = new Thread(new ParseXmlByStaxThread(insertFile, uuid));
                     parseXmlThread.setPriority(10);
@@ -69,7 +72,8 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                         logger.info("===========文件解析入库完成==============");
                     }
                     FileUtils.moveAndRenameFile(insertFile, PropertyUtil.getPropValue(PropsStr.FileAchievePath), uuid);
-                    insertFileStatus(this.DBConnection, uuid, insertFile.getName(), "EndPDP");
+//                    insertFileStatus(this.DBConnection, uuid, insertFile.getName(), "EndPDP");
+                    rdcFileStatusService.updateStateByUUId("EndPDP", uuid);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (SQLException e) {

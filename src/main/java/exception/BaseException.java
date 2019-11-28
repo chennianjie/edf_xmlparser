@@ -5,12 +5,12 @@ package exception;
  * @Author: nianjie.chen
  * @Date: 11/27/2019
  */
-public class FeedException extends RuntimeException {
+public class BaseException extends RuntimeException {
 
-    public FeedException() {
+    public BaseException() {
     }
 
-    public FeedException(String message) {
+    public BaseException(String message) {
         super(message);
     }
 }

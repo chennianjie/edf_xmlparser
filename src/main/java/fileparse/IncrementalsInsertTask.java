@@ -11,6 +11,10 @@ import oracle.sql.ARRAY;
 import oracle.sql.ArrayDescriptor;
 import oracle.sql.JAVA_STRUCT;
 import oracle.sql.StructDescriptor;
+import service.IncrementalStgService;
+import service.RdcFileBatchService;
+import service.impl.IncrementalStgServiceImp;
+import service.impl.RdcFileBatchServiceImp;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -32,6 +36,10 @@ public class IncrementalsInsertTask implements Runnable {
     private Connection arrayConnection;
     private OracleCallableStatement proc;
     private CountDownLatch endControl;
+    private IncrementalStgService incrementalStgServiceImp = new IncrementalStgServiceImp();
+    private RdcFileBatchService rdcFileBatchServiceImp = new RdcFileBatchServiceImp();
+    private Integer batchIndex;
+
     public IncrementalsInsertTask() {
     }
 
@@ -45,12 +53,10 @@ public class IncrementalsInsertTask implements Runnable {
 
     @Override
     public void run() {
-
         //get data from queue by batch then insert into DB
         boolean done = false;
         List<IncrementalStg> incList = new ArrayList<>();
         try {
-
             while (!done){
                 if (ProcessBatchQueues.IncrementalQueue.size() == 0) {
                         SleepTools.ms(20000);
@@ -63,26 +69,30 @@ public class IncrementalsInsertTask implements Runnable {
                     incList.add(stg);
                 }
                 if (incList.size() == batchNum){
-                    callInsertIncProcedure(incList);
+//                    callInsertIncProcedure(incList);
+                    batchIndex = SDIFileInsertProcessor.batch_index.getAndIncrement();
+                    rdcFileBatchServiceImp.insert(uuid, batchIndex);
+                    incrementalStgServiceImp.insertByBatch(incList, batchIndex, uuid);
                     ProcessBatchQueues.insertNum.addAndGet(100);
                     incList.clear();
                 }
             }
 
             if (!incList.isEmpty()) {
-                callInsertIncProcedure(incList);
+                rdcFileBatchServiceImp.insert(uuid, batchIndex);
+                incrementalStgServiceImp.insertByBatch(incList, SDIFileInsertProcessor.batch_index.getAndIncrement(), uuid);
                 ProcessBatchQueues.insertNum.addAndGet(incList.size());
                 incList.clear();
             }
 
-        } catch (SQLException e) {
-            try {
-                done = true;
-                ProcessBatchQueues.IncrementalQueue.put(ParseXMLBySaxThread.getDUMMY());
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-            e.printStackTrace();
+//        } catch (SQLException e) {
+//            try {
+//                done = true;
+//                ProcessBatchQueues.IncrementalQueue.put(ParseXMLBySaxThread.getDUMMY());
+//            } catch (InterruptedException ex) {
+//                ex.printStackTrace();
+//            }
+//            e.printStackTrace();
 
         } catch (InterruptedException e) {
             try {
@@ -104,7 +114,6 @@ public class IncrementalsInsertTask implements Runnable {
                     arrayConnection.close();
                 }
             }catch (SQLException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             //endControl change status
@@ -126,7 +135,6 @@ public class IncrementalsInsertTask implements Runnable {
               tran2Oracle(arrayConnection, incList,
                bat_index);
         proc.setARRAY(4, resultArr);
-        //System.out.println(Thread.currentThread().getName() + "==>batch_index:" +bat_index + "==>incListSize:" + incList.size() + "==>uuid:"+uuid +"==>filename:" +fileName);
         proc.execute();
         proc.close();
     }
@@ -168,7 +176,6 @@ public class IncrementalsInsertTask implements Runnable {
         ArrayDescriptor arryDesc = ArrayDescriptor.createDescriptor(
                 "RDC_COLLECTED.RDC_INCR_COL_TYPE", con);
         ARRAY list = new ARRAY(arryDesc, con, structs);
-//        con.close();
         return list;
     }
 }

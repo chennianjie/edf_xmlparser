@@ -1,7 +1,7 @@
 package exception;
 
 @SuppressWarnings("serial")
-public class DBFeedException extends FeedException {
+public class DBFeedException extends BaseException {
 
 	public DBFeedException(String msg) {
 		super(msg);
