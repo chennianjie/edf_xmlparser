@@ -1,5 +1,7 @@
 package common;
 
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -13,6 +15,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * move file by nio
  */
 public class CopyTree implements FileVisitor {
+    private static Logger logger = Logger.getLogger(CopyTree.class);
 
     private final Path copyFrom;
     private final Path copyTo;
@@ -52,7 +55,7 @@ public class CopyTree implements FileVisitor {
     @Override
     public FileVisitResult preVisitDirectory(Object dir, BasicFileAttributes attrs)
             throws IOException {
-        System.out.println("Copy directory: " + (Path) dir);
+        logger.info("Copy directory: " + (Path) dir);
         Path newdir = copyTo.resolve(copyFrom.relativize((Path) dir));
         try {
             Files.copy((Path) dir, newdir, REPLACE_EXISTING, COPY_ATTRIBUTES);
@@ -67,7 +70,7 @@ public class CopyTree implements FileVisitor {
     @Override
     public FileVisitResult visitFile(Object file, BasicFileAttributes attrs)
             throws IOException {
-        System.out.println("Copy file: " + (Path) file);
+        logger.info("Copy file: " + (Path) file);
         copySubTree((Path) file, copyTo.resolve(copyFrom.relativize((Path) file)));
         return FileVisitResult.CONTINUE;
     }

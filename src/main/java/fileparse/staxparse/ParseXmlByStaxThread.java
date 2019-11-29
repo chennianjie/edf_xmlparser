@@ -5,6 +5,7 @@ import entity.ProcessBatchQueues;
 import common.PropertyUtil;
 import entity.IncrementalStg;
 import fileparse.saxparse.ParseXMLBySaxThread;
+import org.apache.log4j.Logger;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -23,6 +24,8 @@ import java.util.Queue;
  * @Date: 10/11/2019
  */
 public class ParseXmlByStaxThread implements Runnable{
+
+    private static Logger logger = Logger.getLogger(ParseXmlByStaxThread.class);
 
     private String type;
     private String subtype;
@@ -136,9 +139,9 @@ public class ParseXmlByStaxThread implements Runnable{
                         break;
                     //文档的结束。
                     case XMLStreamConstants.END_DOCUMENT:
-                        System.out.println("-----------end Document--------");
+                        logger.info("-----------end Document--------");
                         time = System.currentTimeMillis() - time;
-                        System.out.println("解析property数: "+ ProcessBatchQueues.parseNum +"耗时: " + time + "毫秒");
+                        logger.info("解析property数: "+ ProcessBatchQueues.parseNum +"耗时: " + time + "毫秒");
                         break;
                 }
 
@@ -171,9 +174,9 @@ public class ParseXmlByStaxThread implements Runnable{
 
     private void printList(Queue<IncrementalStg> entityList) {
         for (IncrementalStg incrementalStg : entityList) {
-            System.out.println(incrementalStg.toString());
+            logger.info(incrementalStg.toString());
         }
-        System.out.println("一共解析property：" + entityList.size());
+        logger.info("一共解析property：" + entityList.size());
     }
 
 }

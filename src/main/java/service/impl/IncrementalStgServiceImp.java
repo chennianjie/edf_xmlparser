@@ -2,9 +2,8 @@ package service.impl;
 
 import common.OracleConnection;
 import entity.IncrementalStg;
-import exception.BaseException;
 import service.IncrementalStgService;
-
+import common.exception.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

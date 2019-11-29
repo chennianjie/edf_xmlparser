@@ -20,18 +20,18 @@ public class FileUtils {
     private static Logger logger = Logger.getLogger(FileUtils.class);
 
     public static void showFileName(List<File> files) {
-        System.out.println("=============files============");
+        logger.info("=============files============");
         for (File file : files) {
-            System.out.println(file.getName());
+            logger.info(file.getName());
         }
-        System.out.println("===========files end==========");
+        logger.info("===========files end==========");
     }
 
     public static void delete(String filePath) {
         Path path = Paths.get(filePath);
         try {
             Files.delete(path);
-            System.out.println("delete success！");
+            logger.info("delete success！");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,7 +42,7 @@ public class FileUtils {
         Path path2 = Paths.get(targetPath);
         try {
             Files.copy(path1, path2);
-            System.out.println(srcPath + "copy to :" + targetPath);
+            logger.info(srcPath + "copy to :" + targetPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,7 +53,7 @@ public class FileUtils {
         Path path2 = Paths.get(targetPath);
         try {
             Files.move(path1, path2);
-            System.out.println(srcPath + "move to :" + targetPath);
+            logger.info(srcPath + "move to :" + targetPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,7 +87,7 @@ public class FileUtils {
         // Move file to new directory
         boolean success = srcFile.renameTo(new File(dir, srcFile.getName()
                 + "__" + uuid));
-        System.out.println("file move success!: " + srcFile.getName());
+        logger.info("file move success!: " + srcFile.getName());
         return success;
     }
 

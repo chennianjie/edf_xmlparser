@@ -1,4 +1,6 @@
 package common;
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,6 +13,8 @@ import java.util.ArrayList;
  * @Date: 9/24/2019
  */
 public class OracleConnection {
+    private static Logger logger = Logger.getLogger(OracleConnection.class);
+
     private String driverName = "";
     private String dbURL = "";
     private String user = "";
@@ -22,7 +26,7 @@ public class OracleConnection {
     dbURL = PropertyUtil.getPropValue("dbURL");
     user = PropertyUtil.getPropValue("user");
     password = PropertyUtil.getPropValue("password");
-    System.out.println("dbURL:" + dbURL);
+    logger.info("dbURL:" + dbURL);
     }
 
     public static Connection getConnection() {
@@ -66,10 +70,10 @@ public class OracleConnection {
 
     public static void main(String[] args) {
         Connection connection = getConnection();
-        System.out.println(connection);
+        logger.info(connection);
         ArrayList<Long> propertyIds = PropertyUtil.getPropertyIds();
         for (Long i : propertyIds) {
-            System.out.println(i);
+            logger.info(i);
         }
     }
 }

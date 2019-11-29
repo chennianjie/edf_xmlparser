@@ -1,4 +1,4 @@
-package exception;
+package common.exception;
 
 @SuppressWarnings("serial")
 public class DBFeedException extends BaseException {

@@ -1,5 +1,7 @@
 package common;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +14,7 @@ import java.util.*;
  * @Date: 11/27/2019
  */
 public class PropertyUtil {
+    private static Logger logger = Logger.getLogger(PropertyUtil.class);
 
     private static HashMap<String, String> map;
     static {
@@ -81,7 +84,7 @@ public class PropertyUtil {
         HashMap<String, String> map = PropertyUtil.getMap();
         Set<String> strings = map.keySet();
         for (String n : strings) {
-            System.out.println(n + " " + map.get(n));
+            logger.info(n + " " + map.get(n));
         }
     }
 }

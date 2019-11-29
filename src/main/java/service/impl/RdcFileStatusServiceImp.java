@@ -2,7 +2,7 @@ package service.impl;
 
 import common.OracleConnection;
 import entity.RdcFileStatus;
-import exception.BaseException;
+import common.exception.*;
 import service.RdcFileStatusService;
 
 import java.sql.*;
@@ -62,18 +62,5 @@ public class RdcFileStatusServiceImp implements RdcFileStatusService {
         }finally {
             OracleConnection.close(statement, con);
         }
-    }
-
-
-
-    public static void main(String[] args) {
-        RdcFileStatus rdcFileStatus = new RdcFileStatus();
-        rdcFileStatus.setFile_name("chennianjie");
-        rdcFileStatus.setBpm_batch_guid("111");
-//        new RdcFileStatusServiceImp().insert("11","11");
-        Integer sequenceNum = new IqmConfigServiceImp().getSequenceNum();
-        System.out.println(sequenceNum);
-
-        new RdcFileStatusServiceImp().updateStateByUUId("PDP_END", "11");
     }
 }

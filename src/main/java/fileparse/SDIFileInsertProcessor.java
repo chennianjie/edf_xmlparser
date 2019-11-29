@@ -3,7 +3,7 @@ package fileparse;
 import common.*;
 import entity.ProcessBatchQueues;
 import entity.PropsStr;
-import exception.DBFeedException;
+import common.exception.DBFeedException;
 import fileparse.saxparse.ParseXMLBySaxThread;
 import fileparse.staxparse.ParseXmlByStaxThread;
 import org.apache.log4j.Logger;

@@ -75,6 +75,6 @@ public class ZipTools {
         long start = System.currentTimeMillis();
         unzipFolder("C:\\Users\\U6079438\\Desktop\\PDP");
         long end = System.currentTimeMillis();
-        System.out.println(end - start);
+        logger.info(end - start);
     }
 }

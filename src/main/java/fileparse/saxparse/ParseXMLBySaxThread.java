@@ -3,6 +3,7 @@ package fileparse.saxparse;
 import entity.ProcessBatchQueues;
 import common.PropertyUtil;
 import entity.IncrementalStg;
+import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
  * @Date: 9/30/2019
  */
 public class ParseXMLBySaxThread implements Runnable{
+
+    private static Logger logger = Logger.getLogger(ParseXMLBySaxThread.class);
 
     private final static IncrementalStg DUMMY = new IncrementalStg();
     public static IncrementalStg getDUMMY() {
@@ -48,9 +51,9 @@ public class ParseXMLBySaxThread implements Runnable{
             reader.setContentHandler(stuHandler);
             reader.parse(file.getAbsolutePath());
 
-            System.out.println("文件解析完成{"+file.getName()+"}" + "====== uuid{"+uuid+"}" + "===== 解析的property数量{" + ProcessBatchQueues.parseNum + "}");
+            logger.info("文件解析完成{"+file.getName()+"}" + "====== uuid{"+uuid+"}" + "===== 解析的property数量{" + ProcessBatchQueues.parseNum + "}");
             Long end = System.currentTimeMillis();
-            System.out.println("文件解析的时间是(ms)："+ (end - start));
+            logger.info("文件解析的时间是(ms)："+ (end - start));
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (IOException e) {
