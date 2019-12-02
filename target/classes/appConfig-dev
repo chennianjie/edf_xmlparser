@@ -6,7 +6,8 @@ FileAchievePath=C:\\Users\\U6079438\\Desktop\\PDP\\Done
 GzFileAchievePath=C:\\Users\\U6079438\\Desktop\\PDP\\gz
 WorkPath=C:\\Users\\U6079438\\Desktop\\PDP
 FileType=DAT
-
+#ms
+InsertThreadGapTime=15000
 
 #database
 driverName=oracle.jdbc.driver.OracleDriver
