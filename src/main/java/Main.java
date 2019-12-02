@@ -4,6 +4,7 @@ import common.ZipTools;
 import entity.PropsStr;
 import fileparse.SDIFileInsertProcessor;
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
 /**
  * @Description:
@@ -12,6 +13,8 @@ import org.apache.log4j.Logger;
  */
 public class Main {
     private static Logger logger = Logger.getLogger(Math.class);
+
+    @Test
     public static void main(String[] args) {
         Long start = System.currentTimeMillis();
         ZipTools.unzipFolder(PropertyUtil.getPropValue(PropsStr.WorkPath));
@@ -19,6 +22,6 @@ public class Main {
         SDIFileInsertProcessor processor = new SDIFileInsertProcessor();
         processor.process();
         Long end = System.currentTimeMillis();
-        logger.info("一共花费时间(ms)：" + (end - start));
+        logger.info("sum of cost time:" + (end - start) + "ms");
     }
 }

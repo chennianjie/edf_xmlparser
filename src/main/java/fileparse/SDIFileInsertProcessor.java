@@ -45,7 +45,7 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                 try {
                     this.init();
                     uuid = UUID.randomUUID().toString();
-                    logger.info("当前解析文件{}" + fileName + "    uuid{}" + uuid);
+                    logger.info("=========parsing filename{}" + fileName + "  ||  uuid{}" + uuid +"========");
                     this.DBConnection = OracleConnection.getConnection();
 //                    insertFileStatus(this.DBConnection, uuid, insertFile.getName(), "StartPDP");
                     rdcFileStatusService.insert(insertFile.getName(), uuid);
@@ -66,13 +66,12 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                     //wait util this file analysis is complete then change status
                     endControl.await();
                     this.DBConnection = OracleConnection.getConnection();
-                    logger.info("解析的property标签数量：" + ProcessBatchQueues.parseNum);
-                    logger.info("插入数据库的数据条数：" + ProcessBatchQueues.insertNum);
+                    logger.info("property's number of parsed "+ fileName + "：" + ProcessBatchQueues.parseNum);
+                    logger.info("insert to DB nums：" + ProcessBatchQueues.insertNum);
                     if (ProcessBatchQueues.IncrementalQueue.size() == 1 && ProcessBatchQueues.IncrementalQueue.take() == ParseXMLBySaxThread.getDUMMY()) {
-                        logger.info("===========文件解析入库完成==============");
+                        logger.info("=========parse success filename{}" + fileName +"  ||  uuid{}" + uuid +"========");
                     }
                     FileUtils.moveAndRenameFile(insertFile, PropertyUtil.getPropValue(PropsStr.FileAchievePath), uuid);
-//                    insertFileStatus(this.DBConnection, uuid, insertFile.getName(), "EndPDP");
                     rdcFileStatusService.updateStateByUUId("EndPDP", uuid);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

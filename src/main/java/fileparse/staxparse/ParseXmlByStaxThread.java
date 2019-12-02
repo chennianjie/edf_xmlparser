@@ -46,11 +46,8 @@ public class ParseXmlByStaxThread implements Runnable{
         this.uuid = uuid;
     }
 
-    //这里的3个对象是具体的POJO
     IncrementalStg incrementalStg = null;
 
-
-    //基于事件流的方式来做的，通过使用流的ＡＰＩ，像指针一样的来处理文档，每一个节点都可以返回一个事件。处理完以后由JVM来回收内存。
     @Override
     public void run() {
         propertyIds = PropertyUtil.getPropertyIds();
@@ -62,18 +59,17 @@ public class ParseXmlByStaxThread implements Runnable{
             fileReader = new FileReader(file);
             factory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.TRUE);
             reader = factory.createXMLStreamReader(fileReader);
-            int eventReader = reader.getEventType();//获取节点类型,结果是以整形的方式返回的。
+            int eventReader = reader.getEventType();
             Long propertyId = null;
             while (true) {
                 switch (eventReader) {
-                    case XMLStreamConstants.START_DOCUMENT://表示的是文档的开通节点。
+                    case XMLStreamConstants.START_DOCUMENT:
                         time = System.currentTimeMillis();
                         break;
-                    case XMLStreamConstants.START_ELEMENT://开始解析开始节点
+                    case XMLStreamConstants.START_ELEMENT:
                         switch (reader.getLocalName()) {
-                            case "entity": //判断节点的名字
-                                //给节点赋值
-                                type = reader.getAttributeValue(0);//getAttributeValue(index)获取属性的值，可能有多个属性。
+                            case "entity":
+                                type = reader.getAttributeValue(0);
 
                                 subtype = reader.getAttributeValue(1);
                                 rcssubtype = reader.getAttributeValue(2);
@@ -128,7 +124,6 @@ public class ParseXmlByStaxThread implements Runnable{
                                 break;
                         }
                         break;
-                    //文档的结束元素
                     case XMLStreamConstants.END_ELEMENT:
                         if (reader.getLocalName().equals("property")) {
 //                            if (propertyIds.contains(propertyId)) {
@@ -137,11 +132,9 @@ public class ParseXmlByStaxThread implements Runnable{
 //                            }
                         }
                         break;
-                    //文档的结束。
                     case XMLStreamConstants.END_DOCUMENT:
-                        logger.info("-----------end Document--------");
                         time = System.currentTimeMillis() - time;
-                        logger.info("解析property数: "+ ProcessBatchQueues.parseNum +"耗时: " + time + "毫秒");
+                        logger.info("sum of properties: "+ ProcessBatchQueues.parseNum +"cost time: " + time + "ms");
                         break;
                 }
 
@@ -176,7 +169,7 @@ public class ParseXmlByStaxThread implements Runnable{
         for (IncrementalStg incrementalStg : entityList) {
             logger.info(incrementalStg.toString());
         }
-        logger.info("一共解析property：" + entityList.size());
+        logger.info("sum of properties：" + entityList.size());
     }
 
 }

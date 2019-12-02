@@ -28,7 +28,6 @@ public class IncrementalStgServiceImp implements IncrementalStgService {
         if (list == null || list.size() > 100 || batchIndex == null) {
             throw new BaseException("insertByBatch variable empty.");
         }
-
         Connection con = null;
         PreparedStatement pst = null;
         try {
@@ -54,7 +53,6 @@ public class IncrementalStgServiceImp implements IncrementalStgService {
                 pst.setInt(16, batchIndex);
                 pst.setString(17, inc.getCreate_by());
                 pst.setString(18, inc.getReference_flag());
-
                 pst.addBatch();
             }
             pst.executeBatch();

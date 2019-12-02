@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 public class SleepTools {
 
     /**
-     * 按s睡眠
+     * by s
      * @param seconds
      */
     public static final void s(int seconds) {
@@ -17,7 +17,7 @@ public class SleepTools {
     }
 
     /**
-     * 按ms睡眠
+     * by ms
      * @param ms
      */
     public static final void ms(int ms) {

@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 public class EntityXml implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2446115081116715310L;
 	
 	public EntityXml(String file_Name, String uuid, String xml){
@@ -22,13 +19,9 @@ public class EntityXml implements Serializable {
 	public String getXmlContent() {
 		return xmlContent;
 	}
-
-
 	public String getFileName() {
 		return fileName;
 	}
-
-
 	public String getUuid() {
 		return uuid;
 	}

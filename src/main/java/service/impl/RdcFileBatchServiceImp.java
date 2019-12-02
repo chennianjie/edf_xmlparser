@@ -41,7 +41,7 @@ public class RdcFileBatchServiceImp implements RdcFileBatchService {
     }
 
     @Override
-    public void updateState(String batchGuid, String batchIndex, String state) {
+    public void updateState(String batchGuid, Integer batchIndex, String state) {
         if (batchGuid == null || batchIndex == null || state == null) {
             throw new BaseException("rdcFileBatchUpdate variable empty.");
         }
@@ -52,7 +52,7 @@ public class RdcFileBatchServiceImp implements RdcFileBatchService {
             pst = con.prepareStatement(UPDATE_SQL);
             pst.setString(1, state);
             pst.setString(2, batchGuid);
-            pst.setString(3, batchIndex);
+            pst.setInt(3, batchIndex);
             pst.execute();
         } catch (SQLException e) {
             e.printStackTrace();

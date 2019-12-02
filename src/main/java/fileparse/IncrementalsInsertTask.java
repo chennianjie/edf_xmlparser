@@ -29,6 +29,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class IncrementalsInsertTask implements Runnable {
 
+    private final String PDP_END = "PDP_END";
     private static int batchNum = Integer.parseInt(PropertyUtil.getPropValue(PropsStr.BatchNumber));
     private String fileName;
     private String uuid;
@@ -59,7 +60,7 @@ public class IncrementalsInsertTask implements Runnable {
         try {
             while (!done){
                 if (ProcessBatchQueues.IncrementalQueue.size() == 0) {
-                        SleepTools.ms(20000);
+                        SleepTools.ms(Integer.valueOf(PropertyUtil.getPropValue("InsertThreadGapTime")));
                 }
                 IncrementalStg stg = ProcessBatchQueues.IncrementalQueue.take();
                 if (stg == ParseXMLBySaxThread.getDUMMY()) {
@@ -73,6 +74,7 @@ public class IncrementalsInsertTask implements Runnable {
                     batchIndex = SDIFileInsertProcessor.batch_index.getAndIncrement();
                     rdcFileBatchServiceImp.insert(uuid, batchIndex);
                     incrementalStgServiceImp.insertByBatch(incList, batchIndex, uuid);
+                    rdcFileBatchServiceImp.updateState(uuid, batchIndex, PDP_END);
                     ProcessBatchQueues.insertNum.addAndGet(100);
                     incList.clear();
                 }
@@ -81,19 +83,10 @@ public class IncrementalsInsertTask implements Runnable {
             if (!incList.isEmpty()) {
                 rdcFileBatchServiceImp.insert(uuid, batchIndex);
                 incrementalStgServiceImp.insertByBatch(incList, SDIFileInsertProcessor.batch_index.getAndIncrement(), uuid);
+                rdcFileBatchServiceImp.updateState(uuid, batchIndex, PDP_END);
                 ProcessBatchQueues.insertNum.addAndGet(incList.size());
                 incList.clear();
             }
-
-//        } catch (SQLException e) {
-//            try {
-//                done = true;
-//                ProcessBatchQueues.IncrementalQueue.put(ParseXMLBySaxThread.getDUMMY());
-//            } catch (InterruptedException ex) {
-//                ex.printStackTrace();
-//            }
-//            e.printStackTrace();
-
         } catch (InterruptedException e) {
             try {
                 done = true;
@@ -104,8 +97,6 @@ public class IncrementalsInsertTask implements Runnable {
             Thread.interrupted();
             e.printStackTrace();
         } finally {
-
-
             try {
                 if (connection != null) {
                     connection.close();

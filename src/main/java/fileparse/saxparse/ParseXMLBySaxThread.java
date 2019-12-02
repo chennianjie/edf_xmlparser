@@ -42,18 +42,16 @@ public class ParseXMLBySaxThread implements Runnable{
 
         try {
             Long start = System.currentTimeMillis();
-            // 创建解析器工厂、获取解析器
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser parser = factory.newSAXParser();
-            // 创建xml读取器，绑定事件处理器
             XMLReader reader = parser.getXMLReader();
             GetStuInfoHandler stuHandler = new GetStuInfoHandler(file.getName(), uuid);
             reader.setContentHandler(stuHandler);
             reader.parse(file.getAbsolutePath());
 
-            logger.info("文件解析完成{"+file.getName()+"}" + "====== uuid{"+uuid+"}" + "===== 解析的property数量{" + ProcessBatchQueues.parseNum + "}");
+            logger.info("file parse success{"+file.getName()+"}" + "====== uuid{"+uuid+"}" + "=====sum of properties{" + ProcessBatchQueues.parseNum + "}");
             Long end = System.currentTimeMillis();
-            logger.info("文件解析的时间是(ms)："+ (end - start));
+            logger.info("time for file parse(ms)："+ (end - start));
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -101,10 +99,8 @@ class GetStuInfoHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        // 每次解析到一个标签都会触发该方法
         switch (qName) {
             case ENTITY:
-                // 获取entity标签内的属性值
                 if (attributes != null) {
                     type = attributes.getValue("type");
                     subtype = attributes.getValue("subtype");
@@ -178,14 +174,12 @@ class GetStuInfoHandler extends DefaultHandler {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if(qName.equals(PROPERTY)){
-            //添加进队列之前，对其property id进行校验
             if (propertyIds.contains(inc.getProperty_id())) {
                 inc.setReference_flag("Y");
             }else {
                 inc.setReference_flag("N");
             }
-            //ParseXMLBySaxThread.pw.println(inc.toString());
-            ProcessBatchQueues.IncrementalQueue.add(inc);//使用阻塞队列
+            ProcessBatchQueues.IncrementalQueue.add(inc);
             ProcessBatchQueues.parseNum.getAndIncrement();
         }
         flag = null;

@@ -66,15 +66,17 @@ public class FileUtils {
      */
     public static void moveGzFiles(String srcFolderPath, String targetFolderPath) {
         logger.info("moveGzFiles start : " + srcFolderPath);
+        int count = 0;
         File file = new File(srcFolderPath);
         File[] files = file.listFiles();
         for (File f : files) {
             if (f.getName().endsWith(".gz")) {
                 move(f.getAbsolutePath(), targetFolderPath + "\\" + f.getName());
                 logger.info(f.getAbsolutePath() + " to " + targetFolderPath + "\\" + f.getName());
+                count++;
             }
         }
-        logger.info("moveGzFiles end : " + targetFolderPath);
+        logger.info("moveGzFiles end : " + targetFolderPath + "   gzFileCount:" + count);
     }
 
 
@@ -87,7 +89,7 @@ public class FileUtils {
         // Move file to new directory
         boolean success = srcFile.renameTo(new File(dir, srcFile.getName()
                 + "__" + uuid));
-        logger.info("file move success!: " + srcFile.getName());
+        logger.info("file move success: " + srcFile.getName() + "   " + destPath);
         return success;
     }
 
