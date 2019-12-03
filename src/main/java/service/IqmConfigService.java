@@ -7,6 +7,6 @@ package service;
  */
 public interface IqmConfigService {
     Integer getSequenceNum();
-
-    void update(String categoryCode, Integer fileSequence);
+    Integer getLogLevel();
+    void updateSequenceNum(Integer fileSequence);
 }

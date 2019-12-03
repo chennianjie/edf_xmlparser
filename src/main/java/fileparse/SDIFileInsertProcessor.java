@@ -14,6 +14,7 @@ import java.io.File;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -58,7 +59,7 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                     this.endControl = new CountDownLatch(insertThreadNum);
                     logger.info("insert DB thread number{}" + insertThreadNum);
                     while (ProcessBatchQueues.IncrementalQueue.size() == 0) {
-                        SleepTools.ms(5000);
+                        TimeTools.ms(5000);
                     }
                     for (int i = 0; i < insertThreadNum; i++) {
                         new Thread(new IncrementalsInsertTask(fileName, uuid, OracleConnection.getConnection(), OracleConnection.getConnection(), endControl)).start();
@@ -76,6 +77,8 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (ParseException e) {
                     e.printStackTrace();
                 } finally {
                     try {

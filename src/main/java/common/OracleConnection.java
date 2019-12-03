@@ -17,7 +17,7 @@ public class OracleConnection {
 
     private String driverName = "";
     private String dbURL = "";
-    private String user = "";
+    private static String user = "";
     private String password = "";
     public static OracleConnection connection = null;
 
@@ -26,7 +26,10 @@ public class OracleConnection {
     dbURL = PropertyUtil.getPropValue("dbURL");
     user = PropertyUtil.getPropValue("user");
     password = PropertyUtil.getPropValue("password");
-    logger.info("dbURL:" + dbURL);
+    }
+
+    public static String getUser() {
+        return user;
     }
 
     public static Connection getConnection() {
@@ -68,7 +71,7 @@ public class OracleConnection {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         Connection connection = getConnection();
         logger.info(connection);
         ArrayList<Long> propertyIds = PropertyUtil.getPropertyIds();

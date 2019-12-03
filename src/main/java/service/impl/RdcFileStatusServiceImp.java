@@ -1,11 +1,15 @@
 package service.impl;
 
+import common.IQMLogUtil;
 import common.OracleConnection;
-import entity.RdcFileStatus;
+import common.TimeTools;
 import common.exception.*;
+import service.IqmConfigService;
 import service.RdcFileStatusService;
 
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * @Description:
@@ -14,17 +18,22 @@ import java.sql.*;
  */
 public class RdcFileStatusServiceImp implements RdcFileStatusService {
 
+    private IQMLogUtil singleton = IQMLogUtil.getSingleton();
+
+    private IqmConfigService iqmConfigService = new IqmConfigServiceImp();
+
     private static final String INSERT_SQL = "INSERT INTO RDC_file_status(id,FILE_NAME,BPM_batch_guid,FILE_TYPE,SEQUENCE_NUMBER,ingestion_state,START_DATETIME)VALUES" +
                                              "(RDC_FILE_BATCH_SEQ.nextval, ?, ?, 'INCREMENTAL', ?, 'PDP_RUNNING', sysdate)";
 
     private static final String UPDATE_SQL = "UPDATE RDC_file_status b SET b.ingestion_state = ?, b.end_datetime = sysdate WHERE b.BPM_batch_guid = ?";
 
     @Override
-    public void insert(String fileName, String uuid) {
+    public void insert(String fileName, String uuid) throws ParseException{
         if (fileName == null || uuid == null) {
             throw new BaseException("rdcFileStatus variable empty.");
         }
-        int seqNum = new IqmConfigServiceImp().getSequenceNum();
+        singleton.logInit("PDP_STATUS", "PDP_STATUS","PDP_STATUS","PDP_STATUS");
+        int seqNum = iqmConfigService.getSequenceNum();
         if (seqNum == -1) {
             throw new BaseException("seqNum variable empty.");
         }
@@ -40,6 +49,10 @@ public class RdcFileStatusServiceImp implements RdcFileStatusService {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            singleton.logging("INFO", OracleConnection.getUser(), "PDP_STATUS",
+                    "FileName:" + fileName +"  || UUID:" + uuid +"  ||  Start Time:" + TimeTools.getCurrTime("yyyy-MM-dd HH:mm:ss"),
+                    (java.sql.Date) new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(TimeTools.getCurrTime("yyyy-MM-dd HH:mm:ss")));
+
             OracleConnection.close(pst, con);
         }
     }
@@ -57,6 +70,9 @@ public class RdcFileStatusServiceImp implements RdcFileStatusService {
             statement.setString(1, state);
             statement.setString(2, uuid);
             statement.execute();
+            if (state == "EndPDP") {
+                iqmConfigService.updateSequenceNum(iqmConfigService.getSequenceNum()+1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }finally {

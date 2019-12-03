@@ -7,12 +7,12 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 /**
- * @Description:
+ * @Description:  excute cycle by time
  * @Author: nianjie.chen
  * @Date: 10/7/2019
  */
 public class Main {
-    private static Logger logger = Logger.getLogger(Math.class);
+    private static Logger logger = Logger.getLogger(Main.class);
 
     @Test
     public static void main(String[] args) {

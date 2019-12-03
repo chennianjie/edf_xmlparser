@@ -4,7 +4,7 @@ import entity.IncrementalStg;
 import entity.ProcessBatchQueues;
 import common.PropertyUtil;
 import entity.PropsStr;
-import common.SleepTools;
+import common.TimeTools;
 import fileparse.saxparse.ParseXMLBySaxThread;
 import oracle.jdbc.OracleCallableStatement;
 import oracle.sql.ARRAY;
@@ -60,7 +60,7 @@ public class IncrementalsInsertTask implements Runnable {
         try {
             while (!done){
                 if (ProcessBatchQueues.IncrementalQueue.size() == 0) {
-                        SleepTools.ms(Integer.valueOf(PropertyUtil.getPropValue("InsertThreadGapTime")));
+                        TimeTools.ms(Integer.valueOf(PropertyUtil.getPropValue("InsertThreadGapTime")));
                 }
                 IncrementalStg stg = ProcessBatchQueues.IncrementalQueue.take();
                 if (stg == ParseXMLBySaxThread.getDUMMY()) {
