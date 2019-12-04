@@ -8,5 +8,5 @@ public interface RdcFileStatusService {
 
     void insert(String fileName, String uuid) throws ParseException, SQLException;
 
-    void updateStateByUUId(String state, String uuid);
+    void updateStateByUUId(String state, String uuid, String filename);
 }

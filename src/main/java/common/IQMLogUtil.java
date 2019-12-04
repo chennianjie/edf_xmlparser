@@ -39,10 +39,10 @@ public class IQMLogUtil {
 
     private static final String INSERT_SQL = "INSERT INTO IQM_LOG(LOG_ID, LOG_TYPE, LOG_COMPOSITE_NAME, LOG_COMPOSITE_REVISION," +
             "LOG_COMPOSITE_INSTANCE_ID, LOG_ACTIVITY_NAME, LOG_USER, LOG_TITLE, LOG_DESC, LOG_TIMESTAMP, LOG_DATALOAD_VERSION_ID)" +
-            "VALUES (IQM_LOG_SEQ.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "VALUES (IQM_LOG_SEQ.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, sysdate, ?)";
 
     private String compositeName, compositeReversion, compositeInstanceId, activityName;
-    private Integer dataLoadVersionId = null;
+    private Integer dataLoadVersionId = 0;
 
     private IqmConfigServiceImp iqmConfigServiceImp = new IqmConfigServiceImp();
 
@@ -84,8 +84,7 @@ public class IQMLogUtil {
             pst.setString(6, user);
             pst.setString(7, title);
             pst.setString(8, detail);
-            pst.setDate(9, time);
-            pst.setInt(10, this.dataLoadVersionId);
+            pst.setInt(9, this.dataLoadVersionId);
             pst.execute();
         } catch (SQLException e) {
             e.printStackTrace();

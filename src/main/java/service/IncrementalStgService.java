@@ -8,5 +8,5 @@ public interface IncrementalStgService {
 
     void insert(IncrementalStg incrementalStg);
 
-    void insertByBatch(List<IncrementalStg> list, Integer batchNum, String uuid);
+    void insertByBatch(List<IncrementalStg> list, Integer batchNum, String uuid, String fileName);
 }

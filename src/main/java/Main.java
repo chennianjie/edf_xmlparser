@@ -1,27 +1,23 @@
-import common.FileUtils;
 import common.PropertyUtil;
-import common.ZipTools;
-import entity.PropsStr;
-import fileparse.SDIFileInsertProcessor;
-import org.apache.log4j.Logger;
-import org.junit.Test;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 
 /**
- * @Description:  excute cycle by time
+ * @Description:
  * @Author: nianjie.chen
- * @Date: 10/7/2019
+ * @Date: 12/4/2019
  */
 public class Main {
-    private static Logger logger = Logger.getLogger(Main.class);
 
-    @Test
-    public static void main(String[] args) {
-        Long start = System.currentTimeMillis();
-        ZipTools.unzipFolder(PropertyUtil.getPropValue(PropsStr.WorkPath));
-        FileUtils.moveGzFiles(PropertyUtil.getPropValue(PropsStr.WorkPath), PropertyUtil.getPropValue(PropsStr.GzFileAchievePath));
-        SDIFileInsertProcessor processor = new SDIFileInsertProcessor();
-        processor.process();
-        Long end = System.currentTimeMillis();
-        logger.info("sum of cost time:" + (end - start) + "ms");
+    public static void main(String[] args) throws SchedulerException {
+        JobDetail jobDetail = JobBuilder.newJob(XmlParserJob.class)
+                .withIdentity("myJob","myGroup").build();
+        Trigger trigger = TriggerBuilder.newTrigger().withIdentity("mtTrigger", "myGroup").startNow()
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                        .withIntervalInMinutes(Integer.parseInt(PropertyUtil.getPropValue("XmlParserJobGapTime"))).repeatForever()).build();
+        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+        Scheduler scheduler = schedulerFactory.getScheduler();
+        scheduler.start();
+        scheduler.scheduleJob(jobDetail, trigger);
     }
 }

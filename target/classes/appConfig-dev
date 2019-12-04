@@ -8,6 +8,8 @@ WorkPath=C:\\Users\\U6079438\\Desktop\\PDP
 FileType=DAT
 #ms
 InsertThreadGapTime=15000
+#munite
+XmlParserJobGapTime=1
 
 #database
 driverName=oracle.jdbc.driver.OracleDriver

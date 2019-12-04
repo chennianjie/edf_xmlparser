@@ -121,8 +121,4 @@ public class FileUtils {
         }
 
     }
-
-    public static void main(String[] args) {
-        FileUtils.moveGzFiles("C:\\Users\\U6079438\\Desktop\\PDP", "C:\\Users\\U6079438\\Desktop\\PDP\\gz");
-    }
 }
