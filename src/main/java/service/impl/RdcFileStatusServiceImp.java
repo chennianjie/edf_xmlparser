@@ -51,14 +51,14 @@ public class RdcFileStatusServiceImp implements RdcFileStatusService {
         } finally {
             singleton.logging("INFO", OracleConnection.getUser(), "PDP_STATUS",
                     "FileName:" + fileName +"  || UUID:" + uuid +"  ||  Start Time:" + TimeTools.getCurrTime("yyyy-MM-dd HH:mm:ss"),
-                    (java.sql.Date) new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(TimeTools.getCurrTime("yyyy-MM-dd HH:mm:ss")));
+                    new Date(System.currentTimeMillis()));
 
             OracleConnection.close(pst, con);
         }
     }
 
     @Override
-    public void updateStateByUUId(String state, String uuid) {
+    public void updateStateByUUId(String state, String uuid, String fileName) {
         if (state == null || uuid == null) {
             throw new BaseException("state or uuid variable empty.");
         }
@@ -71,7 +71,13 @@ public class RdcFileStatusServiceImp implements RdcFileStatusService {
             statement.setString(2, uuid);
             statement.execute();
             if (state == "EndPDP") {
+                //update seq_num
                 iqmConfigService.updateSequenceNum(iqmConfigService.getSequenceNum()+1);
+                //log
+                singleton.logInit("PDP_STATUS", "PDP_STATUS","PDP_STATUS","PDP_STATUS");
+                singleton.logging("INFO", OracleConnection.getUser(), "PDP_STATUS",
+                        "FileName:" + fileName +"  || UUID:" + uuid +"  ||  End Time:" + TimeTools.getCurrTime("yyyy-MM-dd HH:mm:ss"),
+                        new Date(System.currentTimeMillis()));
             }
         } catch (SQLException e) {
             e.printStackTrace();

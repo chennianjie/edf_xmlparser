@@ -1,10 +1,13 @@
 package service.impl;
 
+import common.IQMLogUtil;
 import common.OracleConnection;
+import common.PropertyUtil;
 import entity.IncrementalStg;
 import service.IncrementalStgService;
 import common.exception.*;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -16,7 +19,9 @@ import java.util.List;
  */
 public class IncrementalStgServiceImp implements IncrementalStgService {
 
+    private Integer insertBatchNumber = Integer.parseInt(PropertyUtil.getPropValue("BatchNumber"));
     private static final String INSERT_SQL = "INSERT INTO RDC_INCREMENTAL_STG VALUES(RDC_INCR_STG_SEQ.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,sysdate,?,?)";
+    private IQMLogUtil iqmLogUtil = IQMLogUtil.getSingleton();
 
     @Override
     public void insert(IncrementalStg incrementalStg) {
@@ -24,8 +29,8 @@ public class IncrementalStgServiceImp implements IncrementalStgService {
     }
 
     @Override
-    public void insertByBatch(List<IncrementalStg> list, Integer batchIndex, String uuid) {
-        if (list == null || list.size() > 100 || batchIndex == null) {
+    public void insertByBatch(List<IncrementalStg> list, Integer batchIndex, String uuid, String fileName) {
+        if (list == null || list.size() > insertBatchNumber || batchIndex == null) {
             throw new BaseException("insertByBatch variable empty.");
         }
         Connection con = null;
@@ -58,6 +63,9 @@ public class IncrementalStgServiceImp implements IncrementalStgService {
             pst.executeBatch();
             con.commit();
         } catch (SQLException e) {
+            iqmLogUtil.logging("ERROR", OracleConnection.getUser(), "PROPERTIES INSERT BY BATCH",
+                    "FileName:" + fileName +"  || UUID:" + uuid +"  ||  Batch Index:" + batchIndex,
+                    new Date(System.currentTimeMillis()));
             e.printStackTrace();
         } finally {
             OracleConnection.close(pst, con);

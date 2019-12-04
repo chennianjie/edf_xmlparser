@@ -134,7 +134,7 @@ public class ParseXmlByStaxThread implements Runnable{
                         break;
                     case XMLStreamConstants.END_DOCUMENT:
                         time = System.currentTimeMillis() - time;
-                        logger.info("sum of properties: "+ ProcessBatchQueues.parseNum +"cost time: " + time + "ms");
+                        logger.info("=========parse file end{}"+ file.getName() +"   sum of properties: "+ ProcessBatchQueues.parseNum +"cost time: " + time + "ms=========");
                         break;
                 }
 

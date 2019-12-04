@@ -2,7 +2,6 @@ common\PropertyUtil.class
 entity\RdcFileBatch.class
 fileparse\saxparse\ParseXMLBySaxThread.class
 fileparse\SDIFileInsertProcessor.class
-common\SleepTools.class
 common\ZipTools.class
 service\RdcFileBatchService.class
 Main.class

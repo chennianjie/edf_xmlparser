@@ -36,6 +36,9 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
     @Override
     public void process() {
         List<File> files = FileUtils.getLocalAbsFiles(PropertyUtil.getPropValue(PropsStr.WorkPath));
+        if (files.size()<=0) {
+            return;
+        }
         String fileType = PropertyUtil.getPropValue(PropsStr.FileType);
         FileUtils.showFileName(files);
         int insertThreadNum;
@@ -73,7 +76,7 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                         logger.info("=========parse success filename{}" + fileName +"  ||  uuid{}" + uuid +"========");
                     }
                     FileUtils.moveAndRenameFile(insertFile, PropertyUtil.getPropValue(PropsStr.FileAchievePath), uuid);
-                    rdcFileStatusService.updateStateByUUId("EndPDP", uuid);
+                    rdcFileStatusService.updateStateByUUId("EndPDP", uuid, fileName);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (SQLException e) {
