@@ -3,7 +3,6 @@ package fileparse;
 import common.*;
 import entity.ProcessBatchQueues;
 import entity.PropsStr;
-import common.exception.DBFeedException;
 import fileparse.saxparse.ParseXMLBySaxThread;
 import fileparse.staxparse.ParseXmlByStaxThread;
 import org.apache.log4j.Logger;
@@ -11,7 +10,6 @@ import service.RdcFileStatusService;
 import service.impl.RdcFileStatusServiceImp;
 
 import java.io.File;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -55,7 +53,6 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                     rdcFileStatusService.insert(insertFile.getName(), uuid);
                     this.DBConnection.close();
                     Thread parseXmlThread = new Thread(new ParseXmlByStaxThread(insertFile, uuid));
-                    parseXmlThread.setPriority(10);
                     parseXmlThread.start();
                     //start thread deal data in queue
                     insertThreadNum = Integer.parseInt(PropertyUtil.getPropValue(PropsStr.InsertThreadNum));
@@ -99,30 +96,5 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
         ProcessBatchQueues.parseNum = new AtomicInteger(0);
         batch_index = new AtomicInteger(1);
     }
-
-
-    private void insertFileStatus(Connection dbConnection2, String uuid_file, String name, String string) {
-        CallableStatement cs = null;
-        try {
-            cs = dbConnection2.prepareCall("call RDC_FILE_status_PRC(?,?,?)");
-            cs.setString(1, uuid_file);
-            cs.setString(2, name);
-            cs.setString(3, string);
-            cs.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DBFeedException(e.getMessage());
-        } finally {
-            try {
-                if (cs != null && !cs.isClosed()) {
-                    cs.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new DBFeedException(e.getLocalizedMessage());
-            }
-        }
-    }
-
 
 }

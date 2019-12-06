@@ -70,7 +70,6 @@ public class IncrementalsInsertTask implements Runnable {
                     incList.add(stg);
                 }
                 if (incList.size() == batchNum){
-//                    callInsertIncProcedure(incList);
                     batchIndex = SDIFileInsertProcessor.batch_index.getAndIncrement();
                     rdcFileBatchServiceImp.insert(uuid, batchIndex);
                     incrementalStgServiceImp.insertByBatch(incList, batchIndex, uuid, fileName);

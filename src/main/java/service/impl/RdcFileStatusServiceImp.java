@@ -9,7 +9,6 @@ import service.RdcFileStatusService;
 
 import java.sql.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 /**
  * @Description:
@@ -22,6 +21,8 @@ public class RdcFileStatusServiceImp implements RdcFileStatusService {
 
     private IqmConfigService iqmConfigService = new IqmConfigServiceImp();
 
+    private static final String QUERY_SQL = "SELECT COUNT(1) FROM RDC_file_status WHERE BPM_batch_guid = ?";
+
     private static final String INSERT_SQL = "INSERT INTO RDC_file_status(id,FILE_NAME,BPM_batch_guid,FILE_TYPE,SEQUENCE_NUMBER,ingestion_state,START_DATETIME)VALUES" +
                                              "(RDC_FILE_BATCH_SEQ.nextval, ?, ?, 'INCREMENTAL', ?, 'PDP_RUNNING', sysdate)";
 
@@ -31,6 +32,10 @@ public class RdcFileStatusServiceImp implements RdcFileStatusService {
     public void insert(String fileName, String uuid) throws ParseException{
         if (fileName == null || uuid == null) {
             throw new BaseException("rdcFileStatus variable empty.");
+        }
+        if (queryCount(uuid) > 0){
+            updateStateByUUId("PDP_RUNNING", uuid, fileName);
+            return;
         }
         singleton.logInit("PDP_STATUS", "PDP_STATUS","PDP_STATUS","PDP_STATUS");
         int seqNum = iqmConfigService.getSequenceNum();
@@ -84,5 +89,27 @@ public class RdcFileStatusServiceImp implements RdcFileStatusService {
         }finally {
             OracleConnection.close(statement, con);
         }
+    }
+
+    public Integer queryCount(String uuid) {
+        if (uuid == null) {
+            throw new BaseException("fileName variable empty.");
+        }
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = OracleConnection.getConnection();
+            statement = con.prepareStatement(QUERY_SQL);
+            statement.setString(1, uuid);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            OracleConnection.close(statement, con);
+        }
+        return 0;
     }
 }
