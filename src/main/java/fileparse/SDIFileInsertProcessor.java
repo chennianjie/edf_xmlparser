@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SDIFileInsertProcessor implements IFeedFileProcessor {
 
     private static Logger logger = Logger.getLogger(SDIFileInsertProcessor.class);
-    private Connection DBConnection;
+    private IQMLogUtil logUtil = IQMLogUtil.getSingleton();
     public static AtomicInteger batch_index = null;
     public CountDownLatch endControl;
     private RdcFileStatusService rdcFileStatusService = new RdcFileStatusServiceImp();
@@ -48,10 +48,9 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                     this.init();
                     uuid = UUID.randomUUID().toString();
                     logger.info("=========parsing filename{}" + fileName + "  ||  uuid{}" + uuid +"========");
-                    this.DBConnection = OracleConnection.getConnection();
 //                    insertFileStatus(this.DBConnection, uuid, insertFile.getName(), "StartPDP");
+                    logUtil.logInit("PDP_STATUS", "PDP_STATUS","PDP_STATUS","PDP_STATUS");
                     rdcFileStatusService.insert(insertFile.getName(), uuid);
-                    this.DBConnection.close();
                     Thread parseXmlThread = new Thread(new ParseXmlByStaxThread(insertFile, uuid));
                     parseXmlThread.start();
                     //start thread deal data in queue
@@ -66,7 +65,6 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                     }
                     //wait util this file analysis is complete then change status
                     endControl.await();
-                    this.DBConnection = OracleConnection.getConnection();
                     logger.info("property's number of parsed "+ fileName + "：" + ProcessBatchQueues.parseNum);
                     logger.info("insert to DB nums：" + ProcessBatchQueues.insertNum);
                     if (ProcessBatchQueues.IncrementalQueue.size() == 1 && ProcessBatchQueues.IncrementalQueue.take() == ParseXMLBySaxThread.getDUMMY()) {
@@ -80,12 +78,6 @@ public class SDIFileInsertProcessor implements IFeedFileProcessor {
                     e.printStackTrace();
                 } catch (ParseException e) {
                     e.printStackTrace();
-                } finally {
-                    try {
-                        DBConnection.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
         }

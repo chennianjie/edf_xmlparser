@@ -87,6 +87,7 @@ public class IncrementalsInsertTask implements Runnable {
                 ProcessBatchQueues.insertNum.addAndGet(incList.size());
                 incList.clear();
             }
+
         } catch (InterruptedException e) {
             iqmLogUtil.logging("ERROR", OracleConnection.getUser(), "IncrementalQueue Take",
                     "FileName:" + fileName +"  || UUID:" + uuid,

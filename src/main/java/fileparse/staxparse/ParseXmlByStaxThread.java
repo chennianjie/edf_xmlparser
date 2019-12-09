@@ -1,6 +1,8 @@
 package fileparse.staxparse;
 
 
+import common.IQMLogUtil;
+import common.OracleConnection;
 import entity.ProcessBatchQueues;
 import common.PropertyUtil;
 import entity.IncrementalStg;
@@ -15,8 +17,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
+import java.sql.Date;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * @Description:
@@ -26,6 +28,7 @@ import java.util.Queue;
 public class ParseXmlByStaxThread implements Runnable{
 
     private static Logger logger = Logger.getLogger(ParseXmlByStaxThread.class);
+    private IQMLogUtil iqmLogUtil = IQMLogUtil.getSingleton();
 
     private String type;
     private String subtype;
@@ -73,7 +76,7 @@ public class ParseXmlByStaxThread implements Runnable{
 
                                 subtype = reader.getAttributeValue(1);
                                 rcssubtype = reader.getAttributeValue(2);
-//                                event = reader.getAttributeValue(3);
+                                event = reader.getAttributeValue(3);
                                 break;
                             case "PI":
                                 pi = reader.getElementText();
@@ -152,8 +155,14 @@ public class ParseXmlByStaxThread implements Runnable{
                 }
             }
         } catch (FileNotFoundException e) {
+            iqmLogUtil.logging("ERROR", OracleConnection.getUser(), "FileNotFoundException",
+                    "FilePath:" + file.getPath() +"  || UUID:" + uuid,
+                    new Date(System.currentTimeMillis()));
             e.printStackTrace();
         } catch (XMLStreamException e) {
+            iqmLogUtil.logging("ERROR", OracleConnection.getUser(), "XMLStreamException",
+                    "FileName:" + file.getName() +"  || UUID:" + uuid,
+                    new Date(System.currentTimeMillis()));
             e.printStackTrace();
         } finally {
                 ProcessBatchQueues.IncrementalQueue.add(ParseXMLBySaxThread.getDUMMY());
@@ -164,12 +173,4 @@ public class ParseXmlByStaxThread implements Runnable{
                 }
         }
     }
-
-    private void printList(Queue<IncrementalStg> entityList) {
-        for (IncrementalStg incrementalStg : entityList) {
-            logger.info(incrementalStg.toString());
-        }
-        logger.info("sum of properties：" + entityList.size());
-    }
-
 }

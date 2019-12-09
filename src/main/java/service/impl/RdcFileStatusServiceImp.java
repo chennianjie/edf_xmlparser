@@ -37,7 +37,6 @@ public class RdcFileStatusServiceImp implements RdcFileStatusService {
             updateStateByUUId("PDP_RUNNING", uuid, fileName);
             return;
         }
-        singleton.logInit("PDP_STATUS", "PDP_STATUS","PDP_STATUS","PDP_STATUS");
         int seqNum = iqmConfigService.getSequenceNum();
         if (seqNum == -1) {
             throw new BaseException("seqNum variable empty.");
