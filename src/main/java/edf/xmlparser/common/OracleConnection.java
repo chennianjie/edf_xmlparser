@@ -1,6 +1,7 @@
 package edf.xmlparser.common;
 import org.apache.log4j.Logger;
 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -43,7 +44,7 @@ public class OracleConnection {
             }
         }
         try {
-            Class.forName("oracle.jdbc.OracleDriver");
+            Class.forName(connection.driverName);
             conn = DriverManager.getConnection(connection.dbURL,
                     connection.user, connection.password);
         } catch (Exception e) {
