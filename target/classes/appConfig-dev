@@ -1,7 +1,7 @@
 #parse_xml
 PropertyIds=697292,720619,720854,738252,1049324,1141745,352955056,27207
 InsertThreadNum=8
-BatchNumber=1000
+BatchNumber=100
 FileAchievePath=C:\\Users\\U6079438\\Desktop\\PDP\\Done
 GzFileAchievePath=C:\\Users\\U6079438\\Desktop\\PDP\\gz
 WorkPath=C:\\Users\\U6079438\\Desktop\\PDP

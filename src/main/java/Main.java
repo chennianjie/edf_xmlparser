@@ -1,7 +1,8 @@
-import common.PropertyUtil;
-import job.XmlParserJob;
+import edf.xmlparser.common.PropertyUtil;
+import edf.xmlparser.job.XmlParserJob;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+
 
 /**
  * @Description:
