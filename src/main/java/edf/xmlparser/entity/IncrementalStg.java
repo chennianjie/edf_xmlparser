@@ -22,8 +22,20 @@ public class IncrementalStg implements Serializable {
     private int bpm_batch_index;
     private Date create_date = new Date(System.currentTimeMillis());
     private String create_by = "PDP";
-    private String reference_flag;
     private String fileName;
+
+    /**
+     * 1--invalid   0--valid  default(0)
+     */
+    private Integer isInvalid = 0;
+
+    public Integer getIsInvalid() {
+        return isInvalid;
+    }
+
+    public void setIsInvalid(Integer isInvalid) {
+        this.isInvalid = isInvalid;
+    }
 
     public long getId() {
         return id;
@@ -137,14 +149,6 @@ public class IncrementalStg implements Serializable {
         this.create_by = create_by;
     }
 
-    public String getReference_flag() {
-        return reference_flag;
-    }
-
-    public void setReference_flag(String reference_flag) {
-        this.reference_flag = reference_flag;
-    }
-
     public String getFileName() {
         return fileName;
     }
@@ -170,7 +174,6 @@ public class IncrementalStg implements Serializable {
                 ", bpm_batch_index=" + bpm_batch_index +
                 ", create_date=" + create_date +
                 ", create_by='" + create_by + '\'' +
-                ", reference_flag='" + reference_flag + '\'' +
                 ", fileName='" + fileName + '\'' +
                 '}';
     }

@@ -19,6 +19,19 @@ public class Entity {
 
     private Long pi;
 
+    /**
+     * 1--invalid   0--valid  default(0)
+     */
+    private Integer isInvalid = 0;
+
+    public Integer getIsInvalid() {
+        return isInvalid;
+    }
+
+    public void setIsInvalid(Integer isInvalid) {
+        this.isInvalid = isInvalid;
+    }
+
     private List<IncrementalStg> propertyList;
 
     public String getType() {

@@ -61,10 +61,10 @@ public class SDIFileInsertProcessor{
                     }
                     //wait util this file analysis is complete then change status
                     endControl.await();
-                    logger.info("property's number of parsed "+ fileName + "：" + ProcessBatchQueues.parseNum);
-                    logger.info("insert to DB entity nums：" + ProcessBatchQueues.insertNum);
+                    logger.info("insert to DB entity nums：" + ProcessBatchQueues.insertEntityNum);
+                    logger.info("insert to DB property nums：" + ProcessBatchQueues.insertPropertyNum);
                     if (ProcessBatchQueues.EntityQueue.size() == 1 && ProcessBatchQueues.EntityQueue.take() == ParseXmlByStaxThread.getDUMMY()) {
-                        logger.info("=========parse success filename{}" + fileName +"  ||  uuid{}" + uuid +"========");
+                        logger.info("=========parse end filename{}" + fileName +"  ||  uuid{}" + uuid +"========");
                     }
                     FileUtils.moveAndRenameFile(insertFile, PropertyUtil.getPropValue(PropsStr.FileAchievePath), uuid);
                     rdcFileStatusService.updateStateByUUId("EndPDP", uuid, fileName);
@@ -80,8 +80,10 @@ public class SDIFileInsertProcessor{
     }
 
     private void init() {
-        ProcessBatchQueues.insertNum = new AtomicInteger(0);
-        ProcessBatchQueues.parseNum = new AtomicInteger(0);
+        ProcessBatchQueues.insertPropertyNum = new AtomicInteger(0);
+        ProcessBatchQueues.insertEntityNum = new AtomicInteger(0);
+        ProcessBatchQueues.parsePropertyNum = new AtomicInteger(0);
+        ProcessBatchQueues.parseEntityNum = new AtomicInteger(0);
         batchIndex = new AtomicInteger(1);
     }
 

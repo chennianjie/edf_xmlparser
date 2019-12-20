@@ -5,6 +5,7 @@ import edf.xmlparser.common.OracleConnection;
 import edf.xmlparser.common.PropertyUtil;
 import edf.xmlparser.entity.Entity;
 import edf.xmlparser.entity.IncrementalStg;
+import edf.xmlparser.entity.ProcessBatchQueues;
 import edf.xmlparser.service.IncrementalStgService;
 import edf.xmlparser.common.exception.*;
 import java.sql.Connection;
@@ -20,7 +21,6 @@ import java.util.List;
  */
 public class IncrementalStgServiceImp implements IncrementalStgService {
 
-    private Integer insertBatchNumber = Integer.parseInt(PropertyUtil.getPropValue("BatchNumber"));
     private static final String INSERT_SQL = "INSERT INTO RDC_INCREMENTAL_STG VALUES(RDC_INCR_STG_SEQ.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,sysdate,?)";
     private IQMLogUtil iqmLogUtil = IQMLogUtil.getSingleton();
 
@@ -34,7 +34,7 @@ public class IncrementalStgServiceImp implements IncrementalStgService {
         if (entityList == null || batchIndex == null) {
             throw new BaseException("insertByBatch variable empty.");
         }
-        List<IncrementalStg> incList = null;
+        List<IncrementalStg> incList;
         Connection con = null;
         PreparedStatement pst = null;
         try {
@@ -62,7 +62,9 @@ public class IncrementalStgServiceImp implements IncrementalStgService {
                     pst.setInt(16, batchIndex);
                     pst.setString(17, inc.getCreate_by());
                     pst.addBatch();
+                    ProcessBatchQueues.insertPropertyNum.getAndIncrement();
                 }
+                ProcessBatchQueues.insertEntityNum.getAndIncrement();
             }
             pst.executeBatch();
             con.commit();

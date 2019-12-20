@@ -62,14 +62,14 @@ public class ParseXmlByStaxThread implements Runnable{
         propertyIds = PropertyUtil.getPropertyIds();
         Long time = null;
         XMLInputFactory factory = XMLInputFactory.newInstance();
-        Reader fileReader = null;
+        Reader fileReader;
         XMLStreamReader reader = null;
+        Long propertyId = null;
         try {
             fileReader = new FileReader(file);
             factory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.TRUE);
             reader = factory.createXMLStreamReader(fileReader);
             int eventReader = reader.getEventType();
-            Long propertyId = null;
             while (true) {
                 switch (eventReader) {
                     case XMLStreamConstants.START_DOCUMENT:
@@ -91,16 +91,31 @@ public class ParseXmlByStaxThread implements Runnable{
                                 break;
                             case "PI":
                                 pi = reader.getElementText();
-                                entity.setPi(Long.valueOf(pi));
+                                try {
+                                    entity.setPi(Long.valueOf(pi));
+                                } catch (NumberFormatException e){
+                                    iqmLogUtil.logging("ERROR", OracleConnection.getUser(), "NumberFormatException",
+                                            "FileName:" + file.getName() +"  || UUID:" + uuid + " || PI:" + pi + " || Property_id:" + propertyId + " || exception:" + e.getMessage(),
+                                            new Date(System.currentTimeMillis()));
+                                    e.printStackTrace();
+                                    entity.setIsInvalid(1);
+                                }
                                 break;
                             case "property":
+                                incrementalStg = new IncrementalStg();
 
-                                propertyId = Long.valueOf(reader.getAttributeValue(0));
-//                                if (propertyIds.contains(propertyId)) {
-                                    incrementalStg = new IncrementalStg();
-                                    incrementalStg.setReference_flag("Y");
-                                    incrementalStg.setProperty_id(propertyId);
-//                                }
+                                try {
+                                    propertyId = Long.valueOf(reader.getAttributeValue(0));
+//                                   if (propertyIds.contains(propertyId)) {
+                                        incrementalStg.setProperty_id(propertyId);
+//                                  }
+                                } catch (NumberFormatException e){
+                                    iqmLogUtil.logging("ERROR", OracleConnection.getUser(), "NumberFormatException",
+                                            "FileName:" + file.getName() +"  || UUID:" + uuid + " || PI:" + pi + " || Property_id:" + propertyId + " || exception:" + e.getMessage(),
+                                            new Date(System.currentTimeMillis()));
+                                    e.printStackTrace();
+                                    incrementalStg.setIsInvalid(1);
+                                }
                                 break;
                             case "currValue":
                                     incrementalStg.setCurrent_value(reader.getElementText());
@@ -123,19 +138,23 @@ public class ParseXmlByStaxThread implements Runnable{
                         }
                         break;
                     case XMLStreamConstants.END_ELEMENT:
-                        if (reader.getLocalName().equals("property")) {
+                        if (reader.getLocalName().equals("property") && incrementalStg.getIsInvalid() != 1) {
 //                            if (propertyIds.contains(propertyId)) {
                                 propertyList.add(incrementalStg);
-                                ProcessBatchQueues.parseNum.getAndIncrement();
+
 //                            }
-                        }else if(reader.getLocalName().equals("entity")) {
-                                entity.setPropertyList(propertyList);
-                                ProcessBatchQueues.EntityQueue.add(entity);
+                            ProcessBatchQueues.parsePropertyNum.getAndIncrement();
+                        }else if(reader.getLocalName().equals("entity") && entity.getIsInvalid() != 1) {
+                            entity.setPropertyList(propertyList);
+                            ProcessBatchQueues.EntityQueue.add(entity);
+                            ProcessBatchQueues.parseEntityNum.getAndIncrement();
                         }
                         break;
                     case XMLStreamConstants.END_DOCUMENT:
                         time = System.currentTimeMillis() - time;
-                        logger.info("=========parse file end{}"+ file.getName() +"   sum of properties: "+ ProcessBatchQueues.parseNum +"cost time: " + time + "ms=========");
+                        logger.info("=========parse file end{}"+ file.getName() + " || cost time:" + time + "ms=========");
+                        logger.info("parse entity nums：" + ProcessBatchQueues.parseEntityNum);
+                        logger.info("parse property nums：" + ProcessBatchQueues.parsePropertyNum);
                         break;
                 }
 
@@ -157,6 +176,7 @@ public class ParseXmlByStaxThread implements Runnable{
                     "FilePath:" + file.getPath() +"  || UUID:" + uuid,
                     new Date(System.currentTimeMillis()));
             e.printStackTrace();
+        //eventType!=1 throw XMLStreamException
         } catch (XMLStreamException e) {
             iqmLogUtil.logging("ERROR", OracleConnection.getUser(), "XMLStreamException",
                     "FileName:" + file.getName() +"  || UUID:" + uuid,

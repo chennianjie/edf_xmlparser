@@ -86,10 +86,10 @@ public class FileUtils {
         if (!dir.exists()) {
             dir.mkdirs();
         }
+        String newName = srcFile.getName() + "__" + uuid;
         // Move file to new directory
-        boolean success = srcFile.renameTo(new File(dir, srcFile.getName()
-                + "__" + uuid));
-        logger.info("file move success: " + srcFile.getName() + "   " + destPath);
+        boolean success = srcFile.renameTo(new File(dir, newName));
+        logger.info("file move success: " + srcFile.getName() + "---->" + newName + " | " + destPath);
         return success;
     }
 
