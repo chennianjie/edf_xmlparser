@@ -56,19 +56,19 @@ public class IncrementalsInsertTask implements Runnable {
         //get data from queue by batch then insert into DB
         boolean done = false;
         List<Entity> entityList = new ArrayList<>();
+        Entity entity;
         try {
             while (!done){
                 if (ProcessBatchQueues.EntityQueue.size() == 0) {
                         TimeTools.ms(Integer.valueOf(PropertyUtil.getPropValue("InsertThreadGapTime")));
                 }
-                Entity entity = ProcessBatchQueues.EntityQueue.take();
+                entity = ProcessBatchQueues.EntityQueue.take();
                 if (entity == ParseXmlByStaxThread.getDUMMY()) {
                     ProcessBatchQueues.EntityQueue.put(entity);
                     done = true;
                 }else {
                     entityList.add(entity);
                 }
-
                 if (entityList.size() == batchNum){
                     batchIndex = SDIFileInsertProcessor.batchIndex.getAndIncrement();
                     rdcFileBatchServiceImp.insert(uuid, batchIndex);

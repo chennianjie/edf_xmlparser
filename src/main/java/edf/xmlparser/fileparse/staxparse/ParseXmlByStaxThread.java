@@ -80,6 +80,7 @@ public class ParseXmlByStaxThread implements Runnable{
                             case "entity":
                                 entity = new Entity();
                                 propertyList = new ArrayList<>();
+                                //get null when index out of variables' number
                                 type = reader.getAttributeValue(0);
                                 subtype = reader.getAttributeValue(1);
                                 rcssubtype = reader.getAttributeValue(2);

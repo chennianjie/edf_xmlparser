@@ -25,21 +25,21 @@ public class SDIFileInsertProcessor{
 
     private static Logger logger = Logger.getLogger(SDIFileInsertProcessor.class);
     private IQMLogUtil logUtil = IQMLogUtil.getSingleton();
-    public static AtomicInteger batchIndex = null;
-    public CountDownLatch endControl;
+    public static AtomicInteger batchIndex;
     private RdcFileStatusService rdcFileStatusService = new RdcFileStatusServiceImp();
     private String fileType = PropertyUtil.getPropValue(PropsStr.FileType);
+    private int insertThreadNum;
 
-    public void process() {
-        List<File> files = FileUtils.getLocalAbsFiles(PropertyUtil.getPropValue(PropsStr.WorkPath));
-        if (files.size()<=0) {
+    public void process(List<File> files, String fileAchievePath) {
+        if (files == null || files.size()<=0) {
             return;
         }
         FileUtils.showFileName(files);
-        int insertThreadNum;
         String uuid;
+        String fileName;
+        CountDownLatch endControl;
         for (File insertFile : files) {
-            String fileName = insertFile.getName();
+            fileName= insertFile.getName();
             if (fileType != null && fileType.equals(FileUtils.getFileType(fileName))) {
                 try {
                     this.init();
@@ -47,14 +47,13 @@ public class SDIFileInsertProcessor{
                     logger.info("=========parsing filename{}" + fileName + "  ||  uuid{}" + uuid +"========");
                     logUtil.logInit("PDP_STATUS", "PDP_STATUS","PDP_STATUS","PDP_STATUS");
                     rdcFileStatusService.insert(insertFile.getName(), uuid);
-                    Thread parseXmlThread = new Thread(new ParseXmlByStaxThread(insertFile, uuid));
-                    parseXmlThread.start();
+                    new Thread(new ParseXmlByStaxThread(insertFile, uuid)).start();
                     //start thread deal data in queue
                     insertThreadNum = Integer.parseInt(PropertyUtil.getPropValue(PropsStr.InsertThreadNum));
-                    this.endControl = new CountDownLatch(insertThreadNum);
+                    endControl = new CountDownLatch(insertThreadNum);
                     logger.info("insert DB thread number{}" + insertThreadNum);
                     while (ProcessBatchQueues.EntityQueue.size() == 0) {
-                        TimeTools.ms(5000);
+                        TimeTools.ms(3000);
                     }
                     for (int i = 0; i < insertThreadNum; i++) {
                         new Thread(new IncrementalsInsertTask(fileName, uuid, OracleConnection.getConnection(), OracleConnection.getConnection(), endControl)).start();
@@ -66,7 +65,8 @@ public class SDIFileInsertProcessor{
                     if (ProcessBatchQueues.EntityQueue.size() == 1 && ProcessBatchQueues.EntityQueue.take() == ParseXmlByStaxThread.getDUMMY()) {
                         logger.info("=========parse end filename{}" + fileName +"  ||  uuid{}" + uuid +"========");
                     }
-                    FileUtils.moveAndRenameFile(insertFile, PropertyUtil.getPropValue(PropsStr.FileAchievePath), uuid);
+                    FileUtils.moveAndRenameFile(insertFile, fileAchievePath, uuid);
+                    // TODO: 12/24/2019 如果有错误数据，或者没有完全入库，是否需要更新状态
                     rdcFileStatusService.updateStateByUUId("EndPDP", uuid, fileName);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

@@ -9,7 +9,9 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * @Description:  excute cycle by time
@@ -21,12 +23,13 @@ public class XmlParserJob implements Job {
 
     @Test
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) {
+        SDIFileInsertProcessor processor = new SDIFileInsertProcessor();
         Long start = System.currentTimeMillis();
         ZipTools.unzipFolder(PropertyUtil.getPropValue(PropsStr.WorkPath));
         FileUtils.moveGzFiles(PropertyUtil.getPropValue(PropsStr.WorkPath), PropertyUtil.getPropValue(PropsStr.GzFileAchievePath));
-        SDIFileInsertProcessor processor = new SDIFileInsertProcessor();
-        processor.process();
+        List<File> files = FileUtils.getLocalAbsFiles(PropertyUtil.getPropValue(PropsStr.WorkPath));
+        processor.process(files, PropertyUtil.getPropValue(PropsStr.FileAchievePath));
         Long end = System.currentTimeMillis();
         logger.info("sum of cost time:" + (end - start) + "ms");
     }
