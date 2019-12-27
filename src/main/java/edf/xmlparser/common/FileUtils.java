@@ -37,6 +37,16 @@ public class FileUtils {
         }
     }
 
+    public static void deleteGzFiles(String filePath) {
+       File file = new File(filePath);
+        File[] files = file.listFiles();
+        for (File f : files) {
+            if (f.getName().endsWith(".gz")) {
+                f.delete();
+            }
+        }
+    }
+
     public static void copy(String srcPath, String targetPath) {
         Path path1 = Paths.get(srcPath);
         Path path2 = Paths.get(targetPath);
@@ -119,6 +129,5 @@ public class FileUtils {
         } else {
             return null;
         }
-
     }
 }

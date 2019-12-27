@@ -27,7 +27,8 @@ public class XmlParserJob implements Job {
         SDIFileInsertProcessor processor = new SDIFileInsertProcessor();
         Long start = System.currentTimeMillis();
         ZipTools.unzipFolder(PropertyUtil.getPropValue(PropsStr.WorkPath));
-        FileUtils.moveGzFiles(PropertyUtil.getPropValue(PropsStr.WorkPath), PropertyUtil.getPropValue(PropsStr.GzFileAchievePath));
+        //FileUtils.moveGzFiles(PropertyUtil.getPropValue(PropsStr.WorkPath), PropertyUtil.getPropValue(PropsStr.GzFileAchievePath));
+        FileUtils.deleteGzFiles(PropertyUtil.getPropValue(PropsStr.WorkPath));
         List<File> files = FileUtils.getLocalAbsFiles(PropertyUtil.getPropValue(PropsStr.WorkPath));
         processor.process(files, PropertyUtil.getPropValue(PropsStr.FileAchievePath));
         Long end = System.currentTimeMillis();
