@@ -103,13 +103,13 @@ public class ParseXmlByStaxThread implements Runnable{
                                 }
                                 break;
                             case "property":
-                                incrementalStg = new IncrementalStg();
-
                                 try {
                                     propertyId = Long.valueOf(reader.getAttributeValue(0));
-//                                   if (propertyIds.contains(propertyId)) {
-                                        incrementalStg.setProperty_id(propertyId);
-//                                  }
+                                    if (!propertyIds.contains(propertyId)) {
+                                        break;
+                                    }
+                                    incrementalStg = new IncrementalStg();
+                                    incrementalStg.setProperty_id(propertyId);
                                 } catch (NumberFormatException e){
                                     iqmLogUtil.logging("ERROR", OracleConnection.getUser(), "NumberFormatException",
                                             "FileName:" + file.getName() +"  || UUID:" + uuid + " || PI:" + pi + " || Property_id:" + propertyId + " || exception:" + e.getMessage(),
@@ -119,31 +119,42 @@ public class ParseXmlByStaxThread implements Runnable{
                                 }
                                 break;
                             case "currValue":
-                                    incrementalStg.setCurrent_value(reader.getElementText());
+                                    if (propertyIds.contains(propertyId)){
+                                        incrementalStg.setCurrent_value(reader.getElementText());
+                                    }
                                 break;
                             case "validFrom":
+                                if (propertyIds.contains(propertyId)){
                                     incrementalStg.setValid_from(reader.getElementText());
+                                }
                                 break;
                             case "validTo":
+                                if (propertyIds.contains(propertyId)){
                                     incrementalStg.setValid_to(reader.getElementText());
+                                }
                                 break;
                             case "validFromWithTime":
+                                if (propertyIds.contains(propertyId)){
                                     incrementalStg.setValid_from_inc_time(reader.getElementText());
+                                }
                                 break;
                             case "validToWithTime":
+                                if (propertyIds.contains(propertyId)){
                                     incrementalStg.setValid_to_inc_time(reader.getElementText());
+                                }
                                 break;
                             case "language":
+                                if (propertyIds.contains(propertyId)){
                                     incrementalStg.setLanguage(reader.getElementText());
+                                }
                                 break;
                         }
                         break;
                     case XMLStreamConstants.END_ELEMENT:
                         if (reader.getLocalName().equals("property") && incrementalStg.getIsInvalid() != 1) {
-//                            if (propertyIds.contains(propertyId)) {
+                            if (propertyIds.contains(propertyId)) {
                                 propertyList.add(incrementalStg);
-
-//                            }
+                            }
                             ProcessBatchQueues.parsePropertyNum.getAndIncrement();
                         }else if(reader.getLocalName().equals("entity") && entity.getIsInvalid() != 1) {
                             entity.setPropertyList(propertyList);

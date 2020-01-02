@@ -2,7 +2,6 @@ package edf.xmlparser.service.impl;
 
 import edf.xmlparser.common.IQMLogUtil;
 import edf.xmlparser.common.OracleConnection;
-import edf.xmlparser.common.PropertyUtil;
 import edf.xmlparser.entity.Entity;
 import edf.xmlparser.entity.IncrementalStg;
 import edf.xmlparser.entity.ProcessBatchQueues;
@@ -43,6 +42,9 @@ public class IncrementalStgServiceImp implements IncrementalStgService {
             pst = con.prepareStatement(INSERT_SQL);
             for (Entity en : entityList) {
                 incList = en.getPropertyList();
+                if (incList.size() == 0){
+                    continue;
+                }
                 pst.setLong(1, en.getPi());
                 pst.setString(3, en.getType());
                 pst.setString(4, en.getSubtype());
