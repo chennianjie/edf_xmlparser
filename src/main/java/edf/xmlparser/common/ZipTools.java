@@ -60,11 +60,4 @@ public class ZipTools {
             return false;
         }
     }
-
-    public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-        unzipFolder("C:\\Users\\U6079438\\Desktop\\PDP");
-        long end = System.currentTimeMillis();
-        logger.info(end - start);
-    }
 }
